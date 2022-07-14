@@ -4,7 +4,7 @@ module.exports = {
     entry: './src/main.js',
     output: {
         path: path.resolve(__dirname,'dist'),
-        filename: 'main.js'
+        filename: 'static/js/main.js'
     },
     module:{
         rules:[
@@ -41,6 +41,11 @@ module.exports = {
                         //优点： 减少请求数量， 缺点： 体积会更大
                         maxSize: 20*1024
                     }
+                },
+                generator: {
+                    // 输出图片名称
+                    //[hash:10] hash值取前十位
+                    filename: 'static/images/[hash:10][ext][query]'
                 }
             }
         ]
