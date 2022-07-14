@@ -31,6 +31,17 @@ module.exports = {
                 }, {
                     loader: "sass-loader" // 将 Sass 编译成 CSS
                 }]
+            },
+            {
+                test: /\.(png|jpe?g|gif|webp|svg)$/,
+                type: "asset",
+                parser: {
+                    dataUrlCondition: {
+                        //小于20kb的图片转base64
+                        //优点： 减少请求数量， 缺点： 体积会更大
+                        maxSize: 20*1024
+                    }
+                }
             }
         ]
     },
