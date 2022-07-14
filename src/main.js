@@ -1,3 +1,4 @@
+import './css/index.css'
 import add from './js/demo1'
 import reduce from './js/demo2'
 console.log(add(10,15));
