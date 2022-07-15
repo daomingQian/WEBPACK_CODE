@@ -1,0 +1,25 @@
+@font-face {
+  font-family: "iconfont"; /* Project id  */
+  src: url('../font/iconfont.ttf?t=1657893191344') format('truetype');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-yuechi:before {
+  content: "\e611";
+}
+
+.icon-yuechi1:before {
+  content: "\e682";
+}
+
+.icon-yuechi2:before {
+  content: "\e90e";
+}
+
