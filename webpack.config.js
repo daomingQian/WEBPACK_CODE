@@ -1,10 +1,11 @@
 const path = require('path')
-
+const EslintPlugin = require('eslint-webpack-plugin');
 module.exports = {
     entry: './src/main.js',
     output: {
         path: path.resolve(__dirname,'dist'),
-        filename: 'static/js/main.js'
+        filename: 'static/js/main.js',
+        clean: true //打包前清空path路径下的文件
     },
     module:{
         rules:[
@@ -35,9 +36,23 @@ module.exports = {
                     //[hash:10] hash值取前十位
                     filename: 'static/images/[hash:10][ext][query]'
                 }
+            },
+            {
+                test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
+                type: 'asset/resource',
+                generator: {
+                    //输出名称
+                    filename: 'static/media/[hash:10][ext][query]'
+
+                }
             }
         ]
     },
-    plugins: [],
+    plugins: [
+        new EslintPlugin({
+            //检测哪些文件
+            context: path.resolve(__dirname,'src')
+        })
+    ],
     mode: 'development'
 }
