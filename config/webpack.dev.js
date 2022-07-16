@@ -3,11 +3,6 @@ const EslintPlugin = require('eslint-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: './src/main.js',
-    output: {
-        path: path.resolve(__dirname,'dist'),
-        filename: 'static/js/main.js',
-        clean: true //打包前清空path路径下的文件
-    },
     module:{
         rules:[
             {
@@ -61,14 +56,20 @@ module.exports = {
     plugins: [
         new EslintPlugin({
             //检测src文件夹下文件
-            context: path.resolve(__dirname,'src')
+            context: path.resolve(__dirname,'../src')
         }),
         new HtmlPlugin({
             //模板：以public/index.html文件为模板创建新的html文件
             //新的html文件特点：1.结构和原来一致。2.自动引入打包输出的资源
-            template: path.resolve(__dirname,'public/index.html')
+            template: path.resolve(__dirname,'../public/index.html')
         })
         
     ],
+    //开发服务器
+    devServer:{
+        host: 'localhost', //启动服务器域名
+        port: '3000',
+        open: true, //是否自动打开浏览器
+    },
     mode: 'development'
 }
