@@ -1,5 +1,6 @@
 const path = require('path')
 const EslintPlugin = require('eslint-webpack-plugin');
+const HtmlPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: './src/main.js',
     output: {
@@ -45,14 +46,29 @@ module.exports = {
                     filename: 'static/media/[hash:10][ext][query]'
 
                 }
+            },
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,//排除这些文件
+                loader: 'babel-loader',
+                //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
+                // options: {
+                //     presets: ['@babel/preset-env']
+                // }
             }
         ]
     },
     plugins: [
         new EslintPlugin({
-            //检测哪些文件
+            //检测src文件夹下文件
             context: path.resolve(__dirname,'src')
+        }),
+        new HtmlPlugin({
+            //模板：以public/index.html文件为模板创建新的html文件
+            //新的html文件特点：1.结构和原来一致。2.自动引入打包输出的资源
+            template: path.resolve(__dirname,'public/index.html')
         })
+        
     ],
     mode: 'development'
 }

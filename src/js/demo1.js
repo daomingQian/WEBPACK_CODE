@@ -1,3 +1,3 @@
-export default function add(a,b){
-    return a+b;
+export default function add(...sum){
+    return sum[0]+sum[1];
 }
