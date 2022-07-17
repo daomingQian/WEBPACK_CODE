@@ -2,6 +2,24 @@ const path = require('path')
 const EslintPlugin = require('eslint-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+function getLoader(loader) { //封住获取Loader函数，减少代码复用
+    return [
+        MiniCssExtractPlugin.loader ,
+        "css-loader" ,
+        {
+            loader: "postcss-loader",
+            options: {
+                postcssOptions: {
+                    plugins: [
+                        "postcss-preset-env" //能解决大部分样式兼容性问题
+                    ]
+                }
+            }
+        },
+        loader
+    ].filter(Boolean);
+}
 module.exports = {
     entry: './src/main.js',
     output: {
@@ -13,16 +31,16 @@ module.exports = {
         rules:[
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader' ] 
+                use: getLoader()
                 //style-loader 被 MiniCssExtractPlugin.loader 替换
             },
             {
                 test: /\.less$/,
-                use: [MiniCssExtractPlugin.loader , "css-loader" ,  "less-loader"]
+                use: getLoader("less-loader")
             },
             {
                 test: /\.scss$/,
-                use: [MiniCssExtractPlugin.loader,"css-loader","sass-loader"]
+                use: getLoader("sass-loader")
             },
             {
                 test: /\.(png|jpe?g|gif|webp|svg)$/,
@@ -72,7 +90,8 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             filename: "static/css/main.css",
-        })
+        }),
+        new CssMinimizerPlugin()
         
     ],
     mode: 'production'
