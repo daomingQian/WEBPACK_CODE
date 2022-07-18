@@ -11,3 +11,8 @@ const myFileter = (a,b,c) =>{
     return a+b+c+100;
 }
 console.log(myFileter(10,10,10));
+
+//热模块更新: 一般不用，vue，react自己有
+if(module.hot) {
+    module.hot.accept('./js/demo1')
+}

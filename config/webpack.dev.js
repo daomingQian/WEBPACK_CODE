@@ -4,52 +4,56 @@ const HtmlPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: './src/main.js',
     module:{
-        rules:[
+        rules: [
             {
-                test: /\.css$/,
-                use: [ 'style-loader', 'css-loader' ]
-            },
-            {
-                test: /\.less$/,
-                use: ["style-loader" , "css-loader" ,  "less-loader"]
-            },
-            {
-                test: /\.scss$/,
-                use: ["style-loader","css-loader","sass-loader"]
-            },
-            {
-                test: /\.(png|jpe?g|gif|webp|svg)$/,
-                type: "asset",
-                parser: {
-                    dataUrlCondition: {
-                        //小于20kb的图片转base64
-                        //优点： 减少请求数量， 缺点： 体积会更大
-                        maxSize: 20*1024
+                oneOf: [ //让我们的文件只被一个loader配置，提高打包和编译的速度
+                    {
+                        test: /\.css$/,
+                        use: [ 'style-loader', 'css-loader' ]
+                    },
+                    {
+                        test: /\.less$/,
+                        use: ["style-loader" , "css-loader" ,  "less-loader"]
+                    },
+                    {
+                        test: /\.scss$/,
+                        use: ["style-loader","css-loader","sass-loader"]
+                    },
+                    {
+                        test: /\.(png|jpe?g|gif|webp|svg)$/,
+                        type: "asset",
+                        parser: {
+                            dataUrlCondition: {
+                                //小于20kb的图片转base64
+                                //优点： 减少请求数量， 缺点： 体积会更大
+                                maxSize: 20*1024
+                            }
+                        },
+                        generator: {
+                            // 输出图片名称
+                            //[hash:10] hash值取前十位
+                            filename: 'static/images/[hash:10][ext][query]'
+                        }
+                    },
+                    {
+                        test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
+                        type: 'asset/resource',
+                        generator: {
+                            //输出名称
+                            filename: 'static/media/[hash:10][ext][query]'
+        
+                        }
+                    },
+                    {
+                        test: /\.js$/,
+                        exclude: /node_modules/,//排除这些文件
+                        loader: 'babel-loader', //es6 转es5
+                        //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
+                        // options: {
+                        //     presets: ['@babel/preset-env']
+                        // }
                     }
-                },
-                generator: {
-                    // 输出图片名称
-                    //[hash:10] hash值取前十位
-                    filename: 'static/images/[hash:10][ext][query]'
-                }
-            },
-            {
-                test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
-                type: 'asset/resource',
-                generator: {
-                    //输出名称
-                    filename: 'static/media/[hash:10][ext][query]'
-
-                }
-            },
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,//排除这些文件
-                loader: 'babel-loader',
-                //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
-                // options: {
-                //     presets: ['@babel/preset-env']
-                // }
+                ]
             }
         ]
     },
@@ -70,6 +74,8 @@ module.exports = {
         host: 'localhost', //启动服务器域名
         port: '3000',
         open: true, //是否自动打开浏览器
+        hot: true, //模块热替换
     },
-    mode: 'development'
+    mode: 'development',
+    devtool: 'cheap-module-source-map' //找出 出错的代码位置 行
 }
