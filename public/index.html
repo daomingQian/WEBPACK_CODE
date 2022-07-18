@@ -29,55 +29,29 @@
 </body>
 <!-- <script src="../dist/static/js/main.js"></script> -->
 <script>
-    let length = '1';
-    length = +length;
-    let res = new Array(length).fill(true);
-    out:
-    for (let i = 0; i < length; i++) {
-        const lines = 'present absent present present leaveearly present absent';
-        const line = lines.split(' '); //字符串数组
-        let ab = 0;
-        for (let j = 0; j < line.length; j++) {
-            const status = line[j];
-            if (status === 'absent') ab++;
-            if (ab > 1) {
-                res[i] = false;
-                continue out;
+    function fn(arr) {
+        const map = new Map(); //域名作为key
+        const res = [];
+        for (const str of arr) {
+            const index = str.indexOf(' ');
+            const num = +str.slice(0, index);
+            let name = str.slice(index + 1);
+
+            while (name.includes('.')) {
+                map.set(name, (map.get(name) || 0) + num);
+                const i = name.indexOf('.');
+                name = name.slice(i + 1);
             }
+            map.set(name, (map.get(name) || 0) + num);
         }
-        for (let j = 1; j < line.length; j++) {
-            const statusPre = line[j - 1];
-            const statusCur = line[j];
-            if ((statusPre === 'late' || statusPre === 'leaveearly') &&
-                (statusCur === 'late' || statusCur === 'leaveearly')) {
-                res[i] = false;
-                continue out;
-            }
+        console.log(map);
+        for (const [name, num] of map) {
+            const str = num + ' ' + name;
+            res.push(str);
         }
-        if (line.length < 7) continue;
-        for (let j = 0; j < line.length - 7; j++) {
-            let sum = 0;
-            const status0 = line[j];
-            const status1 = line[j + 1];
-            const status2 = line[j + 2];
-            const status3 = line[j + 3];
-            const status4 = line[j + 4];
-            const status5 = line[j + 5];
-            const status6 = line[j + 6];
-            if (status0 === 'absent' || status0 === 'late' || status0 === 'leaveearly') sum++;
-            if (status1 === 'absent' || status1 === 'late' || status1 === 'leaveearly') sum++;
-            if (status2 === 'absent' || status2 === 'late' || status2 === 'leaveearly') sum++;
-            if (status3 === 'absent' || status3 === 'late' || status3 === 'leaveearly') sum++;
-            if (status4 === 'absent' || status4 === 'late' || status4 === 'leaveearly') sum++;
-            if (status5 === 'absent' || status5 === 'late' || status5 === 'leaveearly') sum++;
-            if (status6 === 'absent' || status6 === 'late' || status6 === 'leaveearly') sum++;
-            if (sum > 3) {
-                res[i] = false;
-                continue out;
-            }
-        }
+        console.log(res);
     }
-    console.log(res.join(' '))
+    fn(["900 google.mail.com", "50 yahoo.com", "1 intel.mail.com", "5 wiki.org"])
 </script>
 
 </html>
