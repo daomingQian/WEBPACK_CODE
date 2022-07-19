@@ -1,6 +1,9 @@
+const os = require('os')
 const path = require('path')
 const EslintPlugin = require('eslint-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
+
+const cpuCount = os.cpus().length; //cpu 核数
 module.exports = {
     entry: './src/main.js',
     module:{
@@ -46,12 +49,26 @@ module.exports = {
                     },
                     {
                         test: /\.js$/,
-                        exclude: /node_modules/,//排除这些文件
-                        loader: 'babel-loader', //es6 转es5
-                        //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
-                        // options: {
-                        //     presets: ['@babel/preset-env']
-                        // }
+                        // exclude: /node_modules/,//排除这些文件  （排除和包含二选一）
+                        include: path.resolve(__dirname,'../src'), //只包含src目录下的js文件
+                        use: [
+                            {
+                                loader: 'thread-loader', //开启多进程
+                                options: {
+                                    Worker: cpuCount, //进程数量
+                                }
+                            },
+                            {
+                                loader: 'babel-loader', //es6转es5
+                                //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
+                                options: {
+                                    // presets: ['@babel/preset-env']
+                                    cacheDirectory: true, //开启babel缓存
+                                    cacheCompression: false, //关闭缓存文件压缩
+                                    plugins: ['@babel/plugin-transform-runtime'], //减少代码体积
+                                }
+                            }
+                        ]
                     }
                 ]
             }
@@ -60,7 +77,15 @@ module.exports = {
     plugins: [
         new EslintPlugin({
             //检测src文件夹下文件
-            context: path.resolve(__dirname,'../src')
+            context: path.resolve(__dirname,'../src'),
+            exclude: 'node_modules', //排除这个目录下的文件
+            cache: true, //开启缓存
+            cacheLocation: path.resolve(
+                __dirname,
+                '../node_modules/.cache/eslint-cache-dev'
+            ),
+            threads: cpuCount, //开启多进程和设置进程数量
+
         }),
         new HtmlPlugin({
             //模板：以public/index.html文件为模板创建新的html文件

@@ -1,8 +1,12 @@
+const os = require('os')
 const path = require('path')
 const EslintPlugin = require('eslint-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
+
+const cpuCount = os.cpus().length; //cpu 核数
 function getLoader(loader) { //封住获取Loader函数，减少代码复用
     return [
         MiniCssExtractPlugin.loader ,
@@ -71,12 +75,26 @@ module.exports = {
                     },
                     {
                         test: /\.js$/,
-                        exclude: /node_modules/,//排除这些文件
-                        loader: 'babel-loader',
-                        //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
-                        // options: {
-                        //     presets: ['@babel/preset-env']
-                        // }
+                        // exclude: /node_modules/,//排除这些文件  （排除和包含二选一）
+                        include: path.resolve(__dirname,'../src'), //只包含src目录下的js文件
+                        use: [
+                            {
+                                loader: 'thread-loader', //开启多进程
+                                options: {
+                                    Worker: cpuCount, //进程数量
+                                }
+                            },
+                            {
+                                loader: 'babel-loader',
+                                //yarn add babel-loader @babel/core @babel/preset-env要下载这些东西
+                                options: {
+                                    // presets: ['@babel/preset-env']
+                                    cacheDirectory: true, //开启babel缓存
+                                    cacheCompression: false, //关闭缓存文件压缩
+                                    plugins: ['@babel/plugin-transform-runtime'], //减少代码体积
+                                },
+                            }
+                        ],
                     }
                 ]
             }
@@ -85,7 +103,14 @@ module.exports = {
     plugins: [
         new EslintPlugin({
             //检测src文件夹下文件
-            context: path.resolve(__dirname,'../src')
+            context: path.resolve(__dirname,'../src'),
+            exclude: 'node_modules',
+            cache: true, //开启缓存
+            cacheLocation: path.resolve(
+                __dirname,
+                '../node_modules/.cache/eslint-cache-prod'
+            ),
+            threads: cpuCount, //开启多进程和设置进程数量
         }),
         new HtmlPlugin({
             //模板：以public/index.html文件为模板创建新的html文件
@@ -95,9 +120,19 @@ module.exports = {
         new MiniCssExtractPlugin({ 
             filename: "static/css/main.css", //所有css 单独打包
         }),
-        new CssMinimizerPlugin() //解决css样式兼容性
+        //new CssMinimizerPlugin() //解决css样式兼容性
         
     ],
+    optimization: {
+        minimizer: [
+            //压缩css
+            new CssMinimizerPlugin(),
+            //压缩js
+            new TerserPlugin({
+                parallel: cpuCount, //开启多进程和设置进程数量
+            })
+        ]
+    },
     mode: 'production',
     devtool: 'source-map' //找出 出错的代码位置 行和列
 }
