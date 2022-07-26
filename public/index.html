@@ -26,32 +26,25 @@
     <span class="iconfont">&#xe611;</span>
     <span class="iconfont">&#xe682;</span>
     <span class="iconfont">&#xe90e;</span>
+    <button class="btn">点击</button>
 </body>
 <!-- <script src="../dist/static/js/main.js"></script> -->
 <script>
-    function fn(arr) {
-        const map = new Map(); //域名作为key
-        const res = [];
-        for (const str of arr) {
-            const index = str.indexOf(' ');
-            const num = +str.slice(0, index);
-            let name = str.slice(index + 1);
-
-            while (name.includes('.')) {
-                map.set(name, (map.get(name) || 0) + num);
-                const i = name.indexOf('.');
-                name = name.slice(i + 1);
-            }
-            map.set(name, (map.get(name) || 0) + num);
-        }
-        console.log(map);
-        for (const [name, num] of map) {
-            const str = num + ' ' + name;
-            res.push(str);
+    var distanceBetweenBusStops = function (distance, start, destination) {
+        let res = 0;
+        let s = Math.min(start, destination);
+        let e = Math.max(start, destination)
+        for (let i = s; i < e; i++) {
+            res += distance[i]
         }
         console.log(res);
-    }
-    fn(["900 google.mail.com", "50 yahoo.com", "1 intel.mail.com", "5 wiki.org"])
+        res = Math.min(res, distance.reduce((a, b) => a + b) - res);
+        return res;
+
+    };
+    distanceBetweenBusStops([7, 10, 1, 12, 11, 14, 5, 0],
+        7,
+        2)
 </script>
 
 </html>

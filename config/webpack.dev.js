@@ -6,6 +6,12 @@ const HtmlPlugin = require('html-webpack-plugin');
 const cpuCount = os.cpus().length; //cpu 核数
 module.exports = {
     entry: './src/main.js',
+    output: {
+        path: undefined,
+        filename: 'static/js/[name].js', //可以兼容多入口
+        chunkFilename: 'static/js/[name].chunk.js', //给打包输出的其他js文件命名
+        assetModuleFilename: 'static/media/[hash:10][ext][query]', //图片,字体等通过type: 'asset',处理的资源文件统一路径和配置
+    },
     module:{
         rules: [
             {
@@ -32,20 +38,20 @@ module.exports = {
                                 maxSize: 20*1024
                             }
                         },
-                        generator: {
-                            // 输出图片名称
-                            //[hash:10] hash值取前十位
-                            filename: 'static/images/[hash:10][ext][query]'
-                        }
+                        // generator: {
+                        //     // 输出图片名称
+                        //     //[hash:10] hash值取前十位
+                        //     filename: 'static/images/[hash:10][ext][query]'
+                        // }
                     },
                     {
                         test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
                         type: 'asset/resource',
-                        generator: {
-                            //输出名称
-                            filename: 'static/media/[hash:10][ext][query]'
+                        // generator: {
+                        //     //输出名称
+                        //     filename: 'static/media/[hash:10][ext][query]'
         
-                        }
+                        // }
                     },
                     {
                         test: /\.js$/,

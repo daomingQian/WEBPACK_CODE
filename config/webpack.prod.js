@@ -3,20 +3,21 @@ const path = require('path')
 const EslintPlugin = require('eslint-webpack-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
+const PreloadPlugin = require('@vue/preload-webpack-plugin')
 
 const cpuCount = os.cpus().length; //cpu 核数
 function getLoader(loader) { //封住获取Loader函数，减少代码复用
     return [
         MiniCssExtractPlugin.loader ,
-        "css-loader" ,
+        'css-loader' ,
         {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
             options: {
                 postcssOptions: {
                     plugins: [
-                        "postcss-preset-env" //能解决大部分样式兼容性问题
+                        'postcss-preset-env' //能解决大部分样式兼容性问题
                     ]
                 }
             }
@@ -28,7 +29,9 @@ module.exports = {
     entry: './src/main.js',
     output: {
         path: path.resolve(__dirname,'../dist'),
-        filename: 'static/js/main.js',
+        filename: 'static/js/[name].js', //可以兼容多入口
+        chunkFilename: 'static/js/[name].chunk.js', //给打包输出的其他js文件命名
+        assetModuleFilename: 'static/media/[hash:10][ext][query]', //图片,字体等通过type: 'asset',处理的资源文件统一路径和配置
         clean: true //打包前清空path路径下的文件
     },
     module:{
@@ -42,15 +45,15 @@ module.exports = {
                     },
                     {
                         test: /\.less$/,
-                        use: getLoader("less-loader")
+                        use: getLoader('less-loader')
                     },
                     {
                         test: /\.scss$/,
-                        use: getLoader("sass-loader")
+                        use: getLoader('sass-loader')
                     },
                     {
                         test: /\.(png|jpe?g|gif|webp|svg)$/,
-                        type: "asset",
+                        type: 'asset',
                         parser: {
                             dataUrlCondition: {
                                 //小于20kb的图片转base64
@@ -58,20 +61,19 @@ module.exports = {
                                 maxSize: 20*1024
                             }
                         },
-                        generator: {
-                            // 输出图片名称
-                            //[hash:10] hash值取前十位
-                            filename: 'static/images/[hash:10][ext][query]'
-                        }
+                        // generator: {
+                        //     // 输出图片名称
+                        //     //[hash:10] hash值取前十位
+                        //     filename: 'static/images/[hash:10][ext][query]'
+                        // }
                     },
                     {
                         test: /\.(ttf|woff2?|mp3|mp4|avi)$/,
                         type: 'asset/resource',
-                        generator: {
-                            //输出名称
-                            filename: 'static/media/[hash:10][ext][query]'
-        
-                        }
+                        // generator: {
+                        //     //输出名称
+                        //     filename: 'static/media/[hash:10][ext][query]'
+                        // }
                     },
                     {
                         test: /\.js$/,
@@ -118,12 +120,19 @@ module.exports = {
             template: path.resolve(__dirname,'../public/index.html')
         }),
         new MiniCssExtractPlugin({ 
-            filename: "static/css/main.css", //所有css 单独打包
+            filename: 'static/css/[name].css', //所有css 单独打包
+            chunkFilename: 'static/css/[name].chunk.css'
         }),
         //new CssMinimizerPlugin() //解决css样式兼容性
+        new PreloadPlugin({ //空闲时间 预加载需要的文件
+            // rel: 'preload', //可以设置优先级
+            // as: 'script',
+            rel: 'prefetch'  //最低优先级
+        })
         
     ],
     optimization: {
+        //压缩的操作
         minimizer: [
             //压缩css
             new CssMinimizerPlugin(),
@@ -131,7 +140,11 @@ module.exports = {
             new TerserPlugin({
                 parallel: cpuCount, //开启多进程和设置进程数量
             })
-        ]
+        ],
+        //代码分割配置: 其他都使用默认值
+        splitChunks: {
+            chunks: 'all'
+        }
     },
     mode: 'production',
     devtool: 'source-map' //找出 出错的代码位置 行和列

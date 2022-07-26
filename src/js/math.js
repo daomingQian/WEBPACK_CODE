@@ -5,3 +5,7 @@ export function myMax(a,b){
 export function myMin(a,b){
     return Math.min(a,b)
 }
+
+export function add(...rest) {
+    return rest.reduce((total,item)=>total+item,0);
+}
