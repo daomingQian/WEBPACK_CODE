@@ -6,7 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const PreloadPlugin = require('@vue/preload-webpack-plugin')
-
+const WorkboxPlugin = require('workbox-webpack-plugin'); //没网的时候用
 const cpuCount = os.cpus().length; //cpu 核数
 function getLoader(loader) { //封住获取Loader函数，减少代码复用
     return [
@@ -128,7 +128,13 @@ module.exports = {
             // rel: 'preload', //可以设置优先级
             // as: 'script',
             rel: 'prefetch'  //最低优先级
-        })
+        }),
+        new WorkboxPlugin.GenerateSW({
+            // these options encourage the ServiceWorkers to get in there fast
+            // and not allow any straggling "old" SWs to hang around
+            clientsClaim: true,
+            skipWaiting: true,
+        }),
         
     ],
     optimization: {
@@ -144,7 +150,11 @@ module.exports = {
         //代码分割配置: 其他都使用默认值
         splitChunks: {
             chunks: 'all'
-        }
+        },
+        //js打包缓存
+        // runtimeChunk: {
+        //     name: (entrypoint) => `runtime~${entrypoint.name}`
+        // }
     },
     mode: 'production',
     devtool: 'source-map' //找出 出错的代码位置 行和列

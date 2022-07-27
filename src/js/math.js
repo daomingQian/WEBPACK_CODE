@@ -9,3 +9,7 @@ export function myMin(a,b){
 export function add(...rest) {
     return rest.reduce((total,item)=>total+item,0);
 }
+
+export function fn(...rest) {
+    return rest.reduce((total,item)=>total+item,0);
+}

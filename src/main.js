@@ -1,3 +1,8 @@
+// 全局引入
+// import 'core-js'
+//按需引入
+// import 'core-js/es/promise'
+
 import './css/iconfont.css'
 import './css/index.css'
 import './less/index.less'
@@ -29,3 +34,23 @@ document.querySelector('.btn').addEventListener('click', function () {
         console.log('模块加载成功',add(9,10));
     })
 })
+
+new Promise((resolve)=>{
+    setTimeout(()=>{
+        resolve()
+    },1000 )
+})
+
+console.log([1,2,3,4,5].includes(1))
+
+
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js').then(registration => {
+        console.log('SW registered: ', registration);
+      }).catch(registrationError => {
+        console.log('SW registration failed: ', registrationError);
+      });
+    });
+  }
